@@ -12,10 +12,10 @@ const port = 443;
 const server = https.createServer(options, (req, res) => {
   if (req.url === '/test') {
     res.writeHead(200);
-    res.end('Сервер успешно работает\n');
+    res.end('Server has been successfully started!\n');
   } else {
     res.writeHead(404);
-    res.end('Страница не найдена\n');
+    res.end('The page was not found!\n');
   }
 });
 
