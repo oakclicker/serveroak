@@ -1,28 +1,28 @@
 const https = require('https');
 const fs = require('fs');
+const hostname = 'oakgame.tech';
 
-// Load the Let's Encrypt certificate and private key
-const cert = fs.readFileSync('/etc/letsencrypt/live/oakgame.tech/fullchain.pem', 'utf8');
-const key = fs.readFileSync('/etc/letsencrypt/live/oakgame.tech/privkey.pem', 'utf8');
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/oakgame.tech/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/oakgame.tech/fullchain.pem')
+};
 
-// Create an HTTPS server
-const server = https.createServer({
-  key,
-  cert,
-});
+const port = 443;
 
-// Define a test route
-server.on('request', (req, res) => {
+const server = https.createServer(options, (req, res) => {
   if (req.url === '/test') {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Server is running successfully!');
+    res.writeHead(200);
+    res.end('Сервер успешно работает\n');
   } else {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not found');
+    res.writeHead(404);
+    res.end('Страница не найдена\n');
   }
 });
 
-const port = 443; // or any other available port like 8443
-server.listen(port, () => {
-  console.log(`Server started on https://oakgame.tech:${port}`);
+server.listen(port, hostname, () => {
+  console.log(`Сервер запущен на https://${hostname}:${port}`);
+});
+
+server.on('error', (error) => {
+  console.error(`Ошибка запуска сервера: ${error}`);
 });
