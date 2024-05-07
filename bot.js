@@ -22,8 +22,7 @@ server.on('request', (req, res) => {
   }
 });
 
-// Start the server
-const port = 22; // or any other available port
+const port = 443; // or any other available port like 8443
 server.listen(port, () => {
   console.log(`Server started on https://oakgame.tech:${port}`);
 });
