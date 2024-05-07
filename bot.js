@@ -22,7 +22,7 @@ server.on('request', (req, res) => {
   }
 });
 
-// Start the server
+// Start the server 22288
 const port = 22; // or any other available port
 server.listen(port, () => {
   console.log(`Server started on https://oakgame.tech:${port}`);
