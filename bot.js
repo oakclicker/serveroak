@@ -10,8 +10,8 @@ const bot = new TelegramBot(token, { polling: true });
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
   const firstname = msg.from.first_name;
-  const lastname = msg.from.last_name || ''; // Добавляем проверку на наличие фамилии
-  const fullname = firstname + (lastname ? ' ' + lastname : ''); // Добавляем фамилию, если она присутствует
+  const lastname = msg.from.last_name || '';
+  const fullname = firstname + (lastname ? ' ' + lastname : '');
   const username = msg.from.username;
   const user_id = msg.from.id;
 
@@ -22,13 +22,8 @@ bot.onText(/\/start/, async (msg) => {
     if (userProfilePhotos.total_count > 0) {
       // Получаем информацию о последней фотографии профиля
       const photoInfo = userProfilePhotos.photos[0][0];
-      // Получаем файл фотографии
-      const photoFile = await bot.getFile(photoInfo.file_id);
-      // Формируем URL для скачивания файла
-      const photoUrl = `https://api.telegram.org/file/bot${token}/${photoFile.file_path}`;
-
       // Отправляем фотографию вместе с приветственным сообщением
-      bot.sendPhoto(chatId, photoUrl, {
+      bot.sendPhoto(chatId, photoInfo.file_id, {
         caption: `Приветствую, ${fullname}! Это тестовое приложение игры OAK Clicker! Чтобы запустить игру, нажмите на кнопку ниже.`,
         reply_markup: {
           inline_keyboard: [
