@@ -22,9 +22,10 @@ bot.onText(/\/start/, async (msg) => {
     if (userProfilePhotos.total_count > 0) {
       // Получаем информацию о последней фотографии профиля
       const photoInfo = userProfilePhotos.photos[0][0];
-      // Отправляем фотографию вместе с приветственным сообщением
-      bot.sendPhoto(chatId, photoInfo.file_id, {
-        caption: `Приветствую, ${fullname}! Это тестовое приложение игры OAK Clicker! Чтобы запустить игру, нажмите на кнопку ниже.`,
+      // Получаем ссылку на фотографию
+      const photoUrl = await bot.getFileLink(photoInfo.file_id);
+      // Отправляем ссылку на фотографию вместе с приветственным сообщением
+      bot.sendMessage(chatId, `Приветствую, ${fullname}! Это тестовое приложение игры OAK Clicker! Твоя аватарка: ${photoUrl}. Чтобы запустить игру, нажми на кнопку ниже.`, {
         reply_markup: {
           inline_keyboard: [
             [{ text: 'Запустить Игру', url: 'https://t.me/oakclickertest_bot/click' }]
@@ -33,7 +34,7 @@ bot.onText(/\/start/, async (msg) => {
       });
     } else {
       // Если у пользователя нет фотографий профиля, отправляем только приветственное сообщение
-      bot.sendMessage(chatId, `Приветствую, ${fullname}! Это тестовое приложение игры OAK Clicker! Чтобы запустить игру, нажмите на кнопку ниже.`, {
+      bot.sendMessage(chatId, `Приветствую, ${fullname}!\nЭто тестовое приложение игры OAK Clicker! Чтобы запустить игру, нажмите на кнопку ниже.\n\n${photoUrl}`, {
         reply_markup: {
           inline_keyboard: [
             [{ text: 'Запустить Игру', url: 'https://t.me/oakclickertest_bot/click' }]
