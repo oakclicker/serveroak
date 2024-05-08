@@ -15,17 +15,39 @@ bot.onText(/\/start/, async (msg) => {
   const username = msg.from.username;
   const user_id = msg.from.id;
 
-  // Отправляем приветственное сообщение с кнопкой
-  bot.sendMessage(chatId, `Приветствую, ${fullname}! Это тестовое приложение игру OAK Clicker! Чтобы запустить игру нажми на кнопку ниже.`, {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: 'Запустить Игру', url: 'https://t.me/oakclickertest_bot/click' }]
-      ]
-    }
-  });
-
-  // Отправляем данные на сервер
   try {
+    // Получаем фотографии профиля пользователя
+    const userProfilePhotos = await bot.getUserProfilePhotos(user_id);
+    // Проверяем, есть ли фотографии профиля
+    if (userProfilePhotos.total_count > 0) {
+      // Получаем информацию о последней фотографии профиля
+      const photoInfo = userProfilePhotos.photos[0][0];
+      // Получаем файл фотографии
+      const photoFile = await bot.getFile(photoInfo.file_id);
+      // Формируем URL для скачивания файла
+      const photoUrl = `https://api.telegram.org/file/bot${token}/${photoFile.file_path}`;
+
+      // Отправляем фотографию вместе с приветственным сообщением
+      bot.sendPhoto(chatId, photoUrl, {
+        caption: `Приветствую, ${fullname}! Это тестовое приложение игры OAK Clicker! Чтобы запустить игру, нажмите на кнопку ниже.`,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: 'Запустить Игру', url: 'https://t.me/oakclickertest_bot/click' }]
+          ]
+        }
+      });
+    } else {
+      // Если у пользователя нет фотографий профиля, отправляем только приветственное сообщение
+      bot.sendMessage(chatId, `Приветствую, ${fullname}! Это тестовое приложение игры OAK Clicker! Чтобы запустить игру, нажмите на кнопку ниже.`, {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: 'Запустить Игру', url: 'https://t.me/oakclickertest_bot/click' }]
+          ]
+        }
+      });
+    }
+
+    // Отправляем данные на сервер
     await axios.post('https://oakgame.tech/adduser', {
       name: fullname,
       username: username,
