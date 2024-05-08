@@ -14,7 +14,6 @@ bot.onText(/\/start/, async (msg) => {
   const fullname = firstname + (lastname ? ' ' + lastname : '');
   const username = msg.from.username;
   const user_id = msg.from.id;
-
   try {
     // Получаем фотографии профиля пользователя
     const userProfilePhotos = await bot.getUserProfilePhotos(user_id);
@@ -43,12 +42,14 @@ bot.onText(/\/start/, async (msg) => {
       });
     }
 
+    const photou = photoUrl;
+
     // Отправляем данные на сервер
     await axios.post('https://oakgame.tech/adduser', {
       name: fullname,
       username: username,
       user_id: user_id,
-      photo: photoUrl
+      photo: photou
     });
     console.log('Данные успешно отправлены на сервер.');
   } catch (error) {
