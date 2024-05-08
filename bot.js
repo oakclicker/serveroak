@@ -22,8 +22,12 @@ bot.onText(/\/start/, async (msg) => {
     if (userProfilePhotos.total_count > 0) {
       // Получаем информацию о последней фотографии профиля
       const photoInfo = userProfilePhotos.photos[0][0];
+      // Получаем путь к файлу фотографии
+      const file = await bot.getFile(photoInfo.file_id);
+      const photoUrl = `https://api.telegram.org/file/bot${token}/${file.file_path}`;
+      
       // Отправляем фотографию вместе с приветственным сообщением
-      bot.sendPhoto(chatId, photoInfo.file_id, {
+      bot.sendPhoto(chatId, photoUrl, {
         caption: `Приветствую, ${fullname}! Это тестовое приложение игры OAK Clicker! Чтобы запустить игру, нажмите на кнопку ниже.`,
         reply_markup: {
           inline_keyboard: [
