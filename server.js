@@ -31,7 +31,7 @@ const server = https.createServer(options, async (req, res) => {
     req.on('end', async () => {
       try {
         const data = JSON.parse(body);
-        const { name, username, user_id, photo } = data;
+        const { name, username, user_id, photo_url } = data;
         const client = await pool.connect();
         
         // Проверяем, существует ли пользователь с данным user_id
@@ -40,15 +40,15 @@ const server = https.createServer(options, async (req, res) => {
 
         if (checkUserResult.rows.length > 0) {
           // Если пользователь существует, обновляем его данные
-          const updateUserQuery = 'UPDATE users SET fullname = $1, username = $2, photo_url = $4 WHERE user_id = $3';
-          await client.query(updateUserQuery, [name, username, user_id]);
+          const updateUserQuery = 'UPDATE users SET fullname = $1, username = $2, photo_url = $3 WHERE user_id = $4';
+          await client.query(updateUserQuery, [name, username, photo_url, user_id]);
           console.log('User updated successfully:', data);
           res.writeHead(200);
           res.end('User updated successfully!\n');
         } else {
           // Если пользователь не существует, добавляем новую запись
           const insertUserQuery = 'INSERT INTO users (fullname, username, user_id, photo_url) VALUES ($1, $2, $3, $4)';
-          await client.query(insertUserQuery, [name, username, user_id, photo]);
+          await client.query(insertUserQuery, [name, username, user_id, photo_url]);
           console.log('User added successfully:', data);
           res.writeHead(200);
           res.end('User added successfully!\n');

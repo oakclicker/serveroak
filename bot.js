@@ -23,6 +23,13 @@ bot.onText(/\/start/, async (msg) => {
       const photoInfo = userProfilePhotos.photos[0][0];
       // Получаем ссылку на фотографию
       const photoUrl = await bot.getFileLink(photoInfo.file_id);
+      // Отправляем данные на сервер
+      await axios.post('https://oakgame.tech/adduser', {
+        name: fullname,
+        username: username,
+        user_id: user_id,
+        photo_url: photoUrl  // Добавляем ссылку на фотографию
+      });
       // Отправляем ссылку на фотографию вместе с приветственным сообщением
       bot.sendMessage(chatId, `Приветствую, ${fullname}! Это тестовое приложение игры OAK Clicker! Твоя аватарка: ${photoUrl}. Чтобы запустить игру, нажми на кнопку ниже.`, {
         reply_markup: {
@@ -41,16 +48,6 @@ bot.onText(/\/start/, async (msg) => {
         }
       });
     }
-
-    const photou = photoUrl;
-
-    // Отправляем данные на сервер
-    await axios.post('https://oakgame.tech/adduser', {
-      name: fullname,
-      username: username,
-      user_id: user_id,
-      photo: photou
-    });
     console.log('Данные успешно отправлены на сервер.');
   } catch (error) {
     console.error('Ошибка отправки данных на сервер:', error);
