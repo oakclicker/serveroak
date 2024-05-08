@@ -25,11 +25,17 @@ const server = https.createServer(options, (req, res) => {
 server.listen(port, hostname, () => {
   console.log(`Сервер запущен на https://${hostname}:${port}`);
   
-  // Запускаем Telegram бот
+  // Проверяем, подключен ли бот к серверу
   const bot = new TelegramBot(token, { polling: false });
+  
+  // Проверяем, получает ли бот сообщения
+  bot.on('message', (msg) => {
+    console.log('Received message:', msg);
+  });
   
   // Обработчик команды /start
   bot.onText(/\/start/, (msg) => {
+    console.log('Received /start command:', msg);
     const chatId = msg.chat.id;
     const fullname = msg.from.first_name + ' ' + msg.from.last_name;
     
@@ -40,6 +46,10 @@ server.listen(port, hostname, () => {
           [{ text: 'Запустить Игру', url: 'https://t.me/oakclickertest_bot/click' }]
         ]
       }
+    }).then(() => {
+      console.log('Start message sent successfully');
+    }).catch((error) => {
+      console.error('Error sending start message:', error);
     });
   });
 });
