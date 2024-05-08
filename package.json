@@ -2,9 +2,9 @@
   "name": "oaks",
   "version": "1.0.0",
   "description": "",
-  "main": "bot.js",
+  "main": "main.js",
   "scripts": {
-    "start": "nodemon bot.js"
+    "start": "nodemon main.js"
   },
   "keywords": [],
   "author": "",
