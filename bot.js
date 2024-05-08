@@ -1,3 +1,4 @@
+const fs = require('fs');
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
@@ -22,6 +23,16 @@ bot.onText(/\/start/, async (msg) => {
     if (userProfilePhotos.total_count > 0) {
       // Получаем информацию о последней фотографии профиля
       const photoInfo = userProfilePhotos.photos[0][0];
+      // Получаем ссылку на файл аватарки
+      const fileLink = await bot.getFileLink(photoInfo.file_id);
+      // Скачиваем аватарку
+      const response = await axios({
+        method: 'GET',
+        url: fileLink,
+        responseType: 'stream'
+      });
+      // Записываем аватарку в файл
+      response.data.pipe(fs.createWriteStream(`users_ico/avatar_${user_id}.png`));
       // Отправляем фотографию вместе с приветственным сообщением
       bot.sendPhoto(chatId, photoInfo.file_id, {
         caption: `Приветствую, ${fullname}! Это тестовое приложение игры OAK Clicker! Чтобы запустить игру, нажмите на кнопку ниже.`,
