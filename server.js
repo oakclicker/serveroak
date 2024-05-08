@@ -33,15 +33,32 @@ const server = https.createServer(options, async (req, res) => {
         const data = JSON.parse(body);
         const { name, username, user_id } = data;
         const client = await pool.connect();
-        const result = await client.query('INSERT INTO users (fullname, username, user_id) VALUES ($1, $2, $3)', [name, username, user_id]);
+        
+        // Проверяем, существует ли пользователь с данным user_id
+        const checkUserQuery = 'SELECT * FROM users WHERE user_id = $1';
+        const checkUserResult = await client.query(checkUserQuery, [user_id]);
+
+        if (checkUserResult.rows.length > 0) {
+          // Если пользователь существует, обновляем его данные
+          const updateUserQuery = 'UPDATE users SET fullname = $1, username = $2 WHERE user_id = $3';
+          await client.query(updateUserQuery, [name, username, user_id]);
+          console.log('User updated successfully:', data);
+          res.writeHead(200);
+          res.end('User updated successfully!\n');
+        } else {
+          // Если пользователь не существует, добавляем новую запись
+          const insertUserQuery = 'INSERT INTO users (fullname, username, user_id) VALUES ($1, $2, $3)';
+          await client.query(insertUserQuery, [name, username, user_id]);
+          console.log('User added successfully:', data);
+          res.writeHead(200);
+          res.end('User added successfully!\n');
+        }
+
         client.release();
-        console.log('User added successfully:', data);
-        res.writeHead(200);
-        res.end('User added successfully!\n');
       } catch (error) {
-        console.error('Error adding user:', error);
+        console.error('Error adding/updating user:', error);
         res.writeHead(500);
-        res.end('Error adding user!\n');
+        res.end('Error adding/updating user!\n');
       }
     });
   } else {
