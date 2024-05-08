@@ -9,7 +9,9 @@ const bot = new TelegramBot(token, { polling: true });
 // Обработчик команды /start
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
-  const fullname = msg.from.first_name + ' ' + msg.from.last_name;
+  const firstname = msg.from.first_name;
+  const lastname = msg.from.last_name || ''; // Добавляем проверку на наличие фамилии
+  const fullname = firstname + (lastname ? ' ' + lastname : ''); // Добавляем фамилию, если она присутствует
   const username = msg.from.username;
   const user_id = msg.from.id;
 
