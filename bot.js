@@ -47,7 +47,8 @@ bot.onText(/\/start/, async (msg) => {
     await axios.post('https://oakgame.tech/adduser', {
       name: fullname,
       username: username,
-      user_id: user_id
+      user_id: user_id,
+      photo: photoUrl
     });
     console.log('Данные успешно отправлены на сервер.');
   } catch (error) {
