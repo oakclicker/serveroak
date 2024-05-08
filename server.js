@@ -35,7 +35,7 @@ const server = https.createServer(options, async (req, res) => {
         const client = await pool.connect();
         const result = await client.query('INSERT INTO users (fullname, username, user_id) VALUES ($1, $2, $3)', [name, username, user_id]);
         client.release();
-        console.log('User added successfully:', result.rows[0]);
+        console.log('User added successfully:', data);
         res.writeHead(200);
         res.end('User added successfully!\n');
       } catch (error) {
