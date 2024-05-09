@@ -44,19 +44,16 @@ const server = https.createServer(options, async (req, res) => {
         const { name, username, user_id, photo_url } = data;
         const client = await pool.connect();
         
-        // Проверяем, существует ли пользователь с данным user_id
         const checkUserQuery = 'SELECT * FROM users WHERE user_id = $1';
         const checkUserResult = await client.query(checkUserQuery, [user_id]);
 
         if (checkUserResult.rows.length > 0) {
-          // Если пользователь существует, обновляем его данные
           const updateUserQuery = 'UPDATE users SET fullname = $1, username = $2, photo_url = $3 WHERE user_id = $4';
           await client.query(updateUserQuery, [name, username, photo_url, user_id]);
           console.log('User updated successfully:', data);
           res.writeHead(200);
           res.end('User updated successfully!\n');
         } else {
-          // Если пользователь не существует, добавляем новую запись
           const insertUserQuery = 'INSERT INTO users (fullname, username, user_id, photo_url) VALUES ($1, $2, $3, $4)';
           await client.query(insertUserQuery, [name, username, user_id, photo_url]);
           console.log('User added successfully:', data);
@@ -111,19 +108,16 @@ const server = https.createServer(options, async (req, res) => {
         const { user_id, balance } = data;
         const client = await pool.connect();
   
-        // Проверяем, существует ли пользователь с данным user_id
         const checkUserQuery = 'SELECT * FROM users WHERE user_id = $1';
         const checkUserResult = await client.query(checkUserQuery, [user_id]);
   
         if (checkUserResult.rows.length > 0) {
-          // Если пользователь существует, обновляем его баланс
           const updateUserBalanceQuery = 'UPDATE users SET balance = $1 WHERE user_id = $2';
           await client.query(updateUserBalanceQuery, [balance, user_id]);
           console.log('User balance updated successfully:', data);
           res.writeHead(200);
           res.end('User balance updated successfully!\n');
         } else {
-          // Если пользователь не существует, отправляем сообщение об ошибке
           console.log('User not found while updating balance:', user_id);
           res.writeHead(404);
           res.end('User not found!\n');
