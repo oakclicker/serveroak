@@ -117,7 +117,7 @@ const server = https.createServer(options, async (req, res) => {
   
         if (checkUserResult.rows.length > 0) {
           // Если пользователь существует, обновляем его баланс
-          const updateUserBalanceQuery = 'UPDATE users SET balance = balance + $1 WHERE user_id = $2';
+          const updateUserBalanceQuery = 'UPDATE users SET balance = $1 WHERE user_id = $2';
           await client.query(updateUserBalanceQuery, [balance, user_id]);
           console.log('User balance updated successfully:', data);
           res.writeHead(200);
