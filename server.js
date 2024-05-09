@@ -20,12 +20,11 @@ const options = {
 const port = 443;
 
 const server = https.createServer(options, async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://oakgamebase.netlify.app'); // Установка разрешенного origin для CORS
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST'); // Установка разрешенных методов
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Установка разрешенных заголовков
+  res.setHeader('Access-Control-Allow-Origin', 'https://oakgamebase.netlify.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    // Ответ на предварительный запрос (preflight request)
     res.writeHead(200);
     res.end();
     return;
@@ -101,6 +100,42 @@ const server = https.createServer(options, async (req, res) => {
       res.writeHead(500);
       res.end('Error loading user!\n');
     }
+  } else if (req.url === '/updateBalance' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body);
+        const { user_id, balance } = data;
+        const client = await pool.connect();
+  
+        // Проверяем, существует ли пользователь с данным user_id
+        const checkUserQuery = 'SELECT * FROM users WHERE user_id = $1';
+        const checkUserResult = await client.query(checkUserQuery, [user_id]);
+  
+        if (checkUserResult.rows.length > 0) {
+          // Если пользователь существует, обновляем его баланс
+          const updateUserBalanceQuery = 'UPDATE users SET balance = balance + $1 WHERE user_id = $2';
+          await client.query(updateUserBalanceQuery, [balance, user_id]);
+          console.log('User balance updated successfully:', data);
+          res.writeHead(200);
+          res.end('User balance updated successfully!\n');
+        } else {
+          // Если пользователь не существует, отправляем сообщение об ошибке
+          console.log('User not found while updating balance:', user_id);
+          res.writeHead(404);
+          res.end('User not found!\n');
+        }
+  
+        client.release();
+      } catch (error) {
+        console.error('Error updating user balance:', error);
+        res.writeHead(500);
+        res.end('Error updating user balance!\n');
+      }
+    });
   } else {
     res.writeHead(404);
     res.end('The page was not found!\n');
