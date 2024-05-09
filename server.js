@@ -61,39 +61,35 @@ const server = https.createServer(options, async (req, res) => {
         res.end('Error adding/updating user!\n');
       }
     });
-  } else if (req.url === '/loadUser' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
-    });
-    req.on('end', async () => {
-      try {
-        const data = JSON.parse(body);
-        const { user_id } = data;
-        const client = await pool.connect();
-        
-        // Получаем данные пользователя по user_id
-        const getUserQuery = 'SELECT fullname, user_id, balance FROM users WHERE user_id = $1';
-        const getUserResult = await client.query(getUserQuery, [user_id]);
+  } else if (req.url.startsWith('/loadUser') && req.method === 'GET') {
+    const urlParams = new URLSearchParams(req.url.split('?')[1]);
+    const userId = urlParams.get('user_id');
+    if (!userId) {
+      res.writeHead(400);
+      res.end('Missing user_id parameter!\n');
+      return;
+    }
 
-        if (getUserResult.rows.length > 0) {
-          // Если пользователь найден, отправляем его данные в ответе
-          const userData = getUserResult.rows[0];
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify(userData));
-        } else {
-          // Если пользователь не найден, отправляем ошибку
-          res.writeHead(404);
-          res.end('User not found!\n');
-        }
+    try {
+      const client = await pool.connect();
+      const checkUserQuery = 'SELECT * FROM users WHERE user_id = $1';
+      const checkUserResult = await client.query(checkUserQuery, [userId]);
+      client.release();
 
-        client.release();
-      } catch (error) {
-        console.error('Error loading user data:', error);
-        res.writeHead(500);
-        res.end('Error loading user data!\n');
+      if (checkUserResult.rows.length > 0) {
+        const userData = checkUserResult.rows[0];
+        console.log('User data:', userData);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(userData));
+      } else {
+        res.writeHead(404);
+        res.end('User not found!\n');
       }
-    });
+    } catch (error) {
+      console.error('Error loading user:', error);
+      res.writeHead(500);
+      res.end('Error loading user!\n');
+    }
   } else {
     res.writeHead(404);
     res.end('The page was not found!\n');
