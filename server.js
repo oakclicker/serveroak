@@ -20,6 +20,11 @@ const options = {
 const port = 443;
 
 const server = https.createServer(options, async (req, res) => {
+  // Установка заголовка CORS
+  res.setHeader('Access-Control-Allow-Origin', 'https://oakgamebase.netlify.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   if (req.url === '/test') {
     res.writeHead(200);
     res.end('Server has been successfully started!\n');
